@@ -78,15 +78,17 @@ def search_directory(directory, search_string, file_types, max_depth=None, callb
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or '-h' in sys.argv:
-        print("Searches file contents from the current directory looking for a given string.")
-        print("Usage: search \"SEARCH_STRING\" \"FILE_TYPES\" [MAX_DEPTH] [-i] [-r \"REPLACEMENT_STRING\"]")
+        print("Searches file contents starting in the current directory looking for a given string.")
+        print("Usage: search \"SEARCH_STRING\" [\"FILE_TYPES\"] [MAX_DEPTH] [-i] [-r \"REPLACEMENT_STRING\"]")
         print("\nOptions:")
         print("-i\t\tCase insensitive search")
         print("-r\t\tReplace mode. Requires a replacement string")
         sys.exit(1)
 
     search_str = sys.argv[1]
-    types = [t.lstrip('.') for t in sys.argv[2].split(',')]
+    
+    # Adjusted logic to set defaults when optional parameters aren't provided
+    types = [t.lstrip('.') for t in sys.argv[2].split(',')] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else ["*"]
     depth = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else None
     case_sensitive = False if '-i' in sys.argv else True
 
@@ -112,3 +114,41 @@ if __name__ == "__main__":
 
     for filename, line_no, line in matched_files:
         print(f"Found in {filename} on line {line_no}: {line.strip()}")
+
+
+# if __name__ == "__main__":
+#     if len(sys.argv) < 2 or '-h' in sys.argv:
+#         print("Searches file contents from the current directory looking for a given string.")
+#         print("Usage: search \"SEARCH_STRING\" \"FILE_TYPES\" [MAX_DEPTH] [-i] [-r \"REPLACEMENT_STRING\"]")
+#         print("\nOptions:")
+#         print("-i\t\tCase insensitive search")
+#         print("-r\t\tReplace mode. Requires a replacement string")
+#         sys.exit(1)
+
+#     search_str = sys.argv[1]
+#     types = [t.lstrip('.') for t in sys.argv[2].split(',')]
+#     depth = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else None
+#     case_sensitive = False if '-i' in sys.argv else True
+
+#     replace_mode = '-r' in sys.argv
+#     replacement_str = None
+#     if replace_mode:
+#         try:
+#             idx = sys.argv.index('-r')
+#             replacement_str = sys.argv[idx + 1]
+#         except (ValueError, IndexError):
+#             print("Error: Please specify the replacement string after the '-r' flag.")
+#             sys.exit(1)
+
+#     total_files = count_files(os.getcwd(), types, depth)
+#     print(f"Searching through {total_files} files...")
+
+#     files_remaining = total_files
+#     matched_files = []
+
+#     search_directory(os.getcwd(), search_str, types, depth, search_and_replace, case_sensitive)
+
+#     print("\n")  # move to the next line after countdown completes
+
+#     for filename, line_no, line in matched_files:
+#         print(f"Found in {filename} on line {line_no}: {line.strip()}")

@@ -8,7 +8,11 @@ BOLD = "\033[1m"
 GREEN = "\033[32m"
 RESET = "\033[0m"
 
+total_files_processed = 0
+total_dirs_processed = 0
+
 def search_files(directory, pattern, max_depth=None, case_insensitive=False, search_directories=False):
+    global total_files_processed, total_dirs_processed
     matched_paths = []
 
     if case_insensitive:
@@ -16,25 +20,35 @@ def search_files(directory, pattern, max_depth=None, case_insensitive=False, sea
 
     for root, dirs, files in os.walk(directory):
         if max_depth is not None:
-            depth = root[len(directory) + len(os.path.sep):].count(os.path.sep)
+            depth = root[len(directory):].count(os.path.sep)
             if depth > max_depth:
                 del dirs[:]
-                continue
+                continue        
 
-        items_to_check = files
         if search_directories:
-            items_to_check += dirs
+            for dirname in dirs:
+                total_dirs_processed += 1
+                target = dirname.lower() if case_insensitive else dirname
+                if fnmatch.fnmatch(target, f"*{pattern}*"):
+                    full_path = os.path.join(root, dirname)
+                    matched_paths.append(full_path)
+                print(f"\rProcessed {total_files_processed} files and {total_dirs_processed} directories...", end='')
 
-        for item in items_to_check:
-            target = item.lower() if case_insensitive else item
+        for filename in files:
+            total_files_processed += 1
+            target = filename.lower() if case_insensitive else filename
             if fnmatch.fnmatch(target, f"*{pattern}*"):
-                full_path = os.path.join(root, item)
+                full_path = os.path.join(root, filename)
                 matched_paths.append(full_path)
+            if search_directories:
+                print(f"\rProcessed {total_files_processed} files and {total_dirs_processed} directories...", end='')
+            else:
+                print(f"\rProcessed {total_files_processed} files (directory names excluded)...", end='')
 
     return matched_paths
 
 def print_usage():
-    print("Searches file and/or directory names from the given directory looking for a pattern within the name.")
+    print("Searches file and/or directory names starting in the given directory looking for a pattern within the name.")
     print("Usage: fsearch DIRECTORY \"PATTERN\" [MAX_DEPTH] [OPTIONS]")
     print("\nOptions:")
     print("  -i       : Perform a case-insensitive search.")
@@ -53,11 +67,15 @@ if __name__ == "__main__":
     search_directories = "-d" in sys.argv
 
     matches = search_files(dir_to_search, pattern, depth, case_insensitive, search_directories)
+    print("\n")  # To move to the next line after processing counter completes
 
     if matches:
-        print(f"{len(matches)} items found:")
+        print(f"{len(matches)} matches found after searching {total_files_processed} files and {total_dirs_processed} directories:")
         for match in matches:
             highlighted_match = re.sub(pattern, lambda m: BOLD + GREEN + m.group() + RESET, match, flags=re.IGNORECASE if case_insensitive else 0)
             print(highlighted_match)
     else:
-        print("No items found.")
+        if search_directories:
+            print(f"No matches found after searching {total_files_processed} files and {total_dirs_processed} directories.")
+        else:
+            print(f"No matches found after searching {total_files_processed} files (directory names excluded).")
