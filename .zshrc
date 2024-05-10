@@ -13,8 +13,8 @@ export DSP_PATH=~/esp/esp-dsp
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-#ZSH_THEME="robbyrussell"
-ZSH_THEME="af-magic"
+ZSH_THEME="robbyrussell"
+#ZSH_THEME="af-magic"
 
 #alias sub='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
 
@@ -147,9 +147,9 @@ alias adapy='cd ~/dev/esp32_dev/Aaron_Adapy'
 alias aaron='cd ~/dev/esp32_dev/Aaron_Adapy'
 
 
-# gnu radio companion for hackrf development (note: osomocom Source, set Device Arguments to "hackrf")
+# gnu radio companion for hackrf development (note: osomocom Source, set GRC Device Arguments to "hackrf")
 function grc() {
-    source /Users/phil/radioconda/bin/activate
+# source /Users/phil/radioconda/bin/activate  # commented out by conda initialize
     # nohup gnuradio-companion > /dev/null 2>&1 &
     nohup gnuradio-companion > /Users/phil/logs/gnuradio-companion.log 2>&1 &
 }
@@ -167,13 +167,13 @@ alias gnu='cd ~/dev/Electronics/GNU_Radio_GRC'
 alias chat='cd ~/dev/scripts && ./chatgpt.sh'
 alias gpt='cd ~/dev/scripts && ./chatgpt.sh'
 
-# launches the NanoVNASaver GUI application from the terminal
-alias vna='NanoVNASaver'
-alias nano='NanoVNASaver'
+# launches the NanoVNASaver GUI application from the terminal (runs in a python virtual environment)
+alias vna='source ~/dev/Electronics/nanovna/bin/activate && NanoVNASaver'
+alias nano='source ~/dev/Electronics/nanovna/bin/activate && NanoVNASaver'
 
-# launches the TinySA Ultra spectrum analyzer app from the terminal
-alias tinysa='cd /Users/phil/dev/Electronics/TinySA_Ultra_Spectrum_Analyzer/QtTinySA && python QtTinySA.py'
-alias tiny='cd /Users/phil/dev/Electronics/TinySA_Ultra_Spectrum_Analyzer/QtTinySA && python QtTinySA.py'
+# launches the TinySA Ultra spectrum analyzer app from the terminal (runs in a python virtual environment)
+alias tiny='source ~/dev/Electronics/tinysa/bin/activate && cd /Users/phil/dev/Electronics/tinysa/QtTinySA && ./QtTinySA.py'
+alias tinysa='source ~/dev/Electronics/tinysa/bin/activate && cd /Users/phil/dev/Electronics/tinysa/QtTinySA && ./QtTinySA.py'
 
 alias dbmtowatts='cd ~/dev/scripts && ./dbm_to_watts'
 alias wattstodbm='cd ~/dev/scripts && ./watts_to_dbm'
@@ -312,6 +312,7 @@ alias py3='python3'
 alias pip='/usr/local/bin/pip3'
 alias pip2='/usr/local/bin/pip'
 alias pip3='/usr/local/bin/pip3'
+PIP_BREAK_SYSTEM_PACKAGES=1
 alias pippackages='cd /usr/local/lib/python3.11/site-packages'
 alias gs='git status'
 alias ga='git add -A'
@@ -373,30 +374,50 @@ alias dump2='adsb2'
 alias adsbrecord='cd /usr/local/bin && ./rtl_sdr -f 1090000000 -s 2000000 -g 50
 alias adsbplayback='cd /Users/phil/dev/adsb/antirez/dump1090 && ./dump1090 --interactive --net --loop --ifile
 
-
-
-
+# commands to setup a python virtual environment and install dependencies (isolates python dependencies from other python dependencies)
+# python3 -m venv dirname               (this will create the directory and setup the virtual environment)
+# source dirname/bin/activate           (this activates the virtual environment)
+# python3 -m pip install xyz            (command to install packages, etc)
+# deactivate                            (command to deactivate the virtual environment)
 
 # tabtab source for electron-forge package
 # uninstall by removing these lines or running `tabtab uninstall electron-forge`
-[[ -f /Users/phil/dev/macgpt/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /Users/phil/dev/macgpt/node_modules/tabtab/.completions/electron-forge.zsh
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/phil/radioconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/phil/radioconda/etc/profile.d/conda.sh" ]; then
-        . "/Users/phil/radioconda/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/phil/radioconda/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+#[[ -f /Users/phil/dev/macgpt/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /Users/phil/dev/macgpt/node_modules/tabtab/.completions/electron-forge.zsh
 
 
-export PATH="$PATH:/Applications/microchip/xc8/v2.46/bin"
+function stop_conda() {
+    conda deactivate
+}
+function start_conda() {
+    conda activate
+}
+
+# function start_conda() {
+#     # >>> conda initialize >>>
+#     # !! Contents within this block are managed by 'conda init' !!
+#     __conda_setup="$('/Users/phil/radioconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+#     if [ $? -eq 0 ]; then
+#         eval "$__conda_setup"
+#     else
+#         if [ -f "/Users/phil/radioconda/etc/profile.d/conda.sh" ]; then
+#             . "/Users/phil/radioconda/etc/profile.d/conda.sh"
+#         else
+#             export PATH="/Users/phil/radioconda/bin:$PATH"
+#         fi
+#     fi
+#     unset __conda_setup
+
+#     if [ -f "/Users/phil/radioconda/etc/profile.d/mamba.sh" ]; then
+#         . "/Users/phil/radioconda/etc/profile.d/mamba.sh"
+#     fi
+#     # <<< conda initialize <<<
+# }
+
+
+export PATH="$PATH:/Applications/microchip/xc8/v2.46/bin:/Users/phil/.local/bin"
 
 # path to the Ghidra decompiler (NSA) 
 export GHIDRA_HOME=" ~/dev/Decompler/ghidra"
+
+
+
