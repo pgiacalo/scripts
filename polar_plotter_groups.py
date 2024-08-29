@@ -78,7 +78,7 @@ def create_polar_scatter_plot(groups, rotation_angle):
     plt.show()
 
 def main():
-    filename = '/Users/phil/dev/scripts/Quadrature_Test_Data.csv'  # Replace with your CSV file name
+    filename = '/Users/phil/dev/scripts/Quadrature_Test_Data_groups.csv'  # Replace with your CSV file name
     
     # Prompt for rotation angle
     rotation_angle = float(input("Enter phase rotation angle in degrees: "))
